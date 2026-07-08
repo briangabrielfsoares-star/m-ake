@@ -1,158 +1,172 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ICANT Admin</title>
-  <link rel="stylesheet" href="css/styles.css" />
-</head>
-<body class="admin-body">
-  <div class="noise"></div>
+(() => {
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+  const PRODUCT_KEY = "icant.products.v2";
+  const SETTINGS_KEY = "icant.settings.v2";
+  const ORDERS_KEY = "icant.orders.v2";
+  const TICKETS_KEY = "icant.tickets.v2";
+  const SESSION_KEY = "icant.admin.session.v2";
+  const CATEGORIES = window.ICANT_CATEGORIES || [
+    { name: "Camisetas", slug: "camisetas" },
+    { name: "Calças", slug: "calcas" },
+    { name: "Calçados", slug: "calcados" },
+    { name: "Acessórios", slug: "acessorios" }
+  ];
+  const money = n => Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const getJSON = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
+  const setJSON = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+  const id = () => `p-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`;
+  let products = getJSON(PRODUCT_KEY, window.ICANT_DEFAULT_PRODUCTS).filter(Boolean);
+  let settings = {...window.ICANT_DEFAULT_SETTINGS, ...getJSON(SETTINGS_KEY,{})};
+  let orders = getJSON(ORDERS_KEY, []);
+  let tickets = getJSON(TICKETS_KEY, []);
+  let currentImage = "";
 
-  <section class="login-screen" data-login>
-    <form class="login-card" data-login-form>
-      <h1>ICANT ADMIN</h1>
-      <p>Entre no painel para adicionar, editar e excluir produtos, configurar PIX/WhatsApp e ver pedidos/atendimentos.</p>
-      <label class="field">Senha do painel<input type="password" name="password" autocomplete="current-password" required></label>
-      <br>
-      <button class="btn full" type="submit">ENTRAR</button>
-      <p class="muted" style="margin-top:14px">Senha configurada: 87759129Br**</p>
-    </form>
-  </section>
+  function toast(msg){ const el=$('[data-toast]'); if(!el) return; el.textContent=msg; el.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('show'),2100); }
+  function escapeHtml(str){ return String(str ?? '').replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c])); }
+  function categoryName(slug){ return CATEGORIES.find(cat => cat.slug === slug)?.name || slug; }
+  function populateCategorySelect(){
+    const sel = $('[data-product-form]')?.elements.category;
+    if(!sel) return;
+    sel.innerHTML = CATEGORIES.map(cat => `<option value="${cat.slug}">${escapeHtml(cat.name)}</option>`).join('');
+  }
+  function save(){ setJSON(PRODUCT_KEY, products); setJSON(SETTINGS_KEY, settings); setJSON(ORDERS_KEY, orders); setJSON(TICKETS_KEY, tickets); renderAll(); toast('Salvo'); }
+  function logged(){ return sessionStorage.getItem(SESSION_KEY)==='yes'; }
+  function showAdmin(){ $('[data-login]').classList.add('hidden'); $('[data-admin]').classList.remove('hidden'); renderAll(); }
 
-  <section class="admin-shell hidden" data-admin>
-    <aside class="admin-sidebar">
-      <div>
-        <div class="admin-logo">ICANT</div>
-        <p class="admin-small">Painel prático para operar a loja.</p>
-      </div>
-      <nav class="admin-nav">
-        <button class="admin-tab active" data-tab="dashboard">Resumo</button>
-        <button class="admin-tab" data-tab="products">Produtos</button>
-        <button class="admin-tab" data-tab="orders">Pedidos</button>
-        <button class="admin-tab" data-tab="tickets">Atendimentos</button>
-        <button class="admin-tab" data-tab="settings">Configurações</button>
-        <button class="admin-tab" data-tab="backup">Backup</button>
-      </nav>
-      <div class="admin-sidebar-footer">
-        <a class="btn ghost full" href="index.html">VER SITE</a>
-        <button class="btn black full" data-logout>SAIR</button>
-      </div>
-    </aside>
+  $('[data-login-form]')?.addEventListener('submit', ev => {
+    ev.preventDefault();
+    const pass = new FormData(ev.currentTarget).get('password');
+    if (pass === (settings.adminPassword || window.ICANT_DEFAULT_SETTINGS.adminPassword)) { sessionStorage.setItem(SESSION_KEY,'yes'); showAdmin(); }
+    else toast('Senha incorreta');
+  });
+  $('[data-logout]')?.addEventListener('click', () => { sessionStorage.removeItem(SESSION_KEY); location.reload(); });
+  populateCategorySelect();
+  if(logged()) showAdmin();
 
-    <main class="admin-content">
-      <div class="admin-top">
-        <div><span class="eyebrow">PAINEL ADMIN</span><h1 data-admin-title>Resumo</h1></div>
-        <button class="btn" data-save-all>SALVAR ALTERAÇÕES</button>
-      </div>
+  $$('[data-tab]').forEach(btn => btn.addEventListener('click', () => {
+    $$('[data-tab]').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+    $$('[data-section]').forEach(s=>s.classList.remove('active'));
+    $(`[data-section="${btn.dataset.tab}"]`)?.classList.add('active');
+    $('[data-admin-title]').textContent = btn.textContent.trim();
+    renderAll();
+  }));
 
-      <section class="admin-section active" data-section="dashboard">
-        <div class="stats">
-          <div class="stat"><span>Produtos</span><strong data-stat-products>0</strong></div>
-          <div class="stat"><span>Pedidos</span><strong data-stat-orders>0</strong></div>
-          <div class="stat"><span>Atendimentos</span><strong data-stat-tickets>0</strong></div>
-          <div class="stat"><span>Total vendido</span><strong data-stat-total>R$ 0,00</strong></div>
-        </div>
-        <div class="admin-note">
-          O site já está com produtos fake e visual igual ao mockup. Para vender agora, configure no menu <strong>Configurações</strong>: sua chave PIX e seu WhatsApp. O pedido gera PIX copia e cola e botão para enviar o pedido no WhatsApp.
-        </div>
-        <div class="admin-card">
-          <h2>Links rápidos</h2>
-          <p class="muted">Painel: <strong>/admin/</strong> ou <strong>/admin.html</strong>. Loja: <strong>/</strong>.</p>
-        </div>
-      </section>
+  function renderStats(){
+    $('[data-stat-products]').textContent = products.length;
+    $('[data-stat-orders]').textContent = orders.length;
+    $('[data-stat-tickets]').textContent = tickets.length;
+    $('[data-stat-total]').textContent = money(orders.reduce((s,o)=>s+Number(o.total||0),0));
+  }
 
-      <section class="admin-section" data-section="products">
-        <div class="admin-grid">
-          <form class="admin-card admin-form" data-product-form>
-            <h2 data-product-form-title>Novo produto</h2>
-            <input type="hidden" name="id">
-            <label class="field">Nome do produto<input required name="name" placeholder="ICANT BLOOM TEE"></label>
-            <div class="form-grid two">
-              <label class="field">Preço<input required name="price" type="number" min="0" step="0.01" placeholder="109.90"></label>
-              <label class="field">Estoque<input required name="stock" type="number" min="0" step="1" value="1"></label>
-            </div>
-            <label class="field">Categoria<select required name="category"><option value="camisetas">Camisetas</option><option value="calcas">Calças</option><option value="calcados">Calçados</option><option value="acessorios">Acessórios</option></select></label>
-            <label class="field">Descrição<textarea name="description" placeholder="Descrição curta do produto"></textarea></label>
-            <label class="field">Imagem por URL<input name="imageUrl" placeholder="https://..."></label>
-            <label class="field">Ou subir imagem do computador<input name="imageFile" type="file" accept="image/*"></label>
-            <div class="image-preview" data-image-preview>Preview da imagem</div>
-            <div class="check-row">
-              <label><input type="checkbox" name="recent"> Recente</label>
-              <label><input type="checkbox" name="active" checked> Ativo</label>
-            </div>
-            <div class="form-actions">
-              <button class="btn" type="submit">SALVAR PRODUTO</button>
-              <button class="btn ghost" type="button" data-product-reset>LIMPAR</button>
-            </div>
-          </form>
-          <div class="admin-card">
-            <div class="admin-list-head"><h2>Produtos cadastrados</h2><input data-product-search placeholder="Buscar produto"></div>
-            <div class="admin-list" data-products-list></div>
-          </div>
-        </div>
-      </section>
+  function renderProducts(){
+    const q = ($('[data-product-search]')?.value || '').toLowerCase().trim();
+    const list = $('[data-products-list]'); if(!list) return;
+    const rows = products.filter(p => !q || `${p.name} ${p.category}`.toLowerCase().includes(q));
+    list.innerHTML = rows.map(p => `<div class="admin-product-row">
+      <img src="${p.image}" alt="${escapeHtml(p.name)}" onerror="this.src='assets/products/icant-logo-tee.png'">
+      <div><h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(categoryName(p.category))} • ${money(p.price)} • Estoque ${Number(p.stock||0)} • ${p.active!==false?'Ativo':'Oculto'} ${p.recent?'• Recente':''}</p></div>
+      <div class="row-actions"><button class="mini" data-edit-product="${p.id}">Editar</button><button class="mini danger" data-delete-product="${p.id}">Excluir</button></div>
+    </div>`).join('') || `<p class="muted">Nenhum produto.</p>`;
+  }
 
-      <section class="admin-section" data-section="orders">
-        <div class="admin-card">
-          <div class="admin-list-head"><h2>Pedidos</h2><button class="btn ghost" data-clear-orders>LIMPAR PEDIDOS</button></div>
-          <div class="admin-list" data-orders-list></div>
-        </div>
-      </section>
+  function fillProductForm(p){
+    const f = $('[data-product-form]'); f.reset();
+    f.elements.id.value = p?.id || '';
+    f.elements.name.value = p?.name || '';
+    f.elements.price.value = p?.price || '';
+    f.elements.stock.value = p?.stock ?? 1;
+    f.elements.category.value = p?.category || CATEGORIES[0]?.slug || 'camisetas';
+    f.elements.description.value = p?.description || '';
+    f.elements.imageUrl.value = p?.image || '';
+    f.elements.recent.checked = !!p?.recent;
+    f.elements.active.checked = p ? p.active !== false : true;
+    currentImage = p?.image || '';
+    $('[data-product-form-title]').textContent = p ? 'Editar produto' : 'Novo produto';
+    renderImagePreview();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  function renderImagePreview(){
+    const box = $('[data-image-preview]');
+    if(currentImage) box.innerHTML = `<img src="${currentImage}" alt="Preview">`;
+    else box.textContent = 'Preview da imagem';
+  }
 
-      <section class="admin-section" data-section="tickets">
-        <div class="admin-card">
-          <div class="admin-list-head"><h2>Atendimentos</h2><button class="btn ghost" data-clear-tickets>LIMPAR ATENDIMENTOS</button></div>
-          <div class="admin-list" data-tickets-list></div>
-        </div>
-      </section>
+  $('[data-product-form]')?.addEventListener('submit', ev => {
+    ev.preventDefault();
+    const f = ev.currentTarget;
+    const pid = f.elements.id.value || id();
+    const image = currentImage || f.elements.imageUrl.value || 'assets/products/icant-logo-tee.png';
+    const p = { id: pid, name: f.elements.name.value.trim().toUpperCase(), price: Number(f.elements.price.value), stock: Number(f.elements.stock.value), category: f.elements.category.value, description: f.elements.description.value.trim(), image, recent: f.elements.recent.checked, active: f.elements.active.checked };
+    const ix = products.findIndex(x => x.id === pid);
+    if (ix >= 0) products[ix] = p; else products.unshift(p);
+    setJSON(PRODUCT_KEY, products); fillProductForm(null); renderAll(); toast('Produto salvo');
+  });
+  $('[data-product-reset]')?.addEventListener('click', () => fillProductForm(null));
+  $('[data-product-search]')?.addEventListener('input', renderProducts);
+  $('[data-product-form]')?.elements.imageUrl.addEventListener('input', ev => { currentImage = ev.target.value.trim(); renderImagePreview(); });
+  $('[data-product-form]')?.elements.imageFile.addEventListener('change', ev => {
+    const file = ev.target.files?.[0]; if(!file) return;
+    if(!file.type.startsWith('image/')) return toast('Arquivo precisa ser imagem');
+    const reader = new FileReader();
+    reader.onload = () => { currentImage = reader.result; $('[data-product-form]').elements.imageUrl.value = ''; renderImagePreview(); };
+    reader.readAsDataURL(file);
+  });
 
-      <section class="admin-section" data-section="settings">
-        <form class="admin-card admin-form" data-settings-form>
-          <h2>Configurações da loja</h2>
-          <div class="settings-grid">
-            <label class="field">Nome da marca<input name="brand"></label>
-            <label class="field">Frase do hero<input name="tagline"></label>
-            <label class="field">Instagram<input name="instagram" placeholder="https://instagram.com/sua_loja"></label>
-            <label class="field">WhatsApp da loja<input name="whatsapp" placeholder="5531999999999"></label>
-            <label class="field">Chave PIX<input name="pixKey" placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"></label>
-            <label class="field">Nome do recebedor PIX<input name="pixName" maxlength="25"></label>
-            <label class="field">Cidade PIX<input name="pixCity" maxlength="15"></label>
-            <label class="field">Link de pagamento/cartão<input name="cardPaymentLink" placeholder="Mercado Pago, Stripe, etc."></label>
-          </div>
-          <label class="field">Texto de envio<textarea name="shippingText"></textarea></label>
-          <label class="field">Texto de atendimento<textarea name="supportText"></textarea></label>
-          <button class="btn" type="submit">SALVAR CONFIGURAÇÕES</button>
-        </form>
-      </section>
+  document.addEventListener('click', ev => {
+    const edit = ev.target.closest('[data-edit-product]');
+    if(edit){ const p=products.find(x=>x.id===edit.dataset.editProduct); if(p) fillProductForm(p); return; }
+    const del = ev.target.closest('[data-delete-product]');
+    if(del){ if(confirm('Excluir este produto?')){ products=products.filter(p=>p.id!==del.dataset.deleteProduct); setJSON(PRODUCT_KEY,products); renderAll(); toast('Produto excluído'); } return; }
+    const status = ev.target.closest('[data-order-status]');
+    if(status){ const o=orders.find(x=>x.id===status.dataset.orderStatus); if(o){ o.status=status.dataset.status; setJSON(ORDERS_KEY,orders); renderAll(); } return; }
+    const ticketStatus = ev.target.closest('[data-ticket-status]');
+    if(ticketStatus){ const t=tickets.find(x=>x.id===ticketStatus.dataset.ticketStatus); if(t){ t.status=ticketStatus.dataset.status; setJSON(TICKETS_KEY,tickets); renderAll(); } return; }
+  });
 
-      <section class="admin-section" data-section="backup">
-        <div class="admin-grid">
-          <div class="admin-card export-box">
-            <h2>Exportar dados</h2>
-            <p class="muted">Use para guardar uma cópia ou migrar para outro navegador.</p>
-            <textarea data-export readonly></textarea>
-            <button class="btn" data-generate-export>GERAR BACKUP</button>
-            <button class="btn ghost" data-copy-export>COPIAR BACKUP</button>
-          </div>
-          <div class="admin-card export-box">
-            <h2>Importar dados</h2>
-            <p class="muted">Cole um backup antigo e clique em importar.</p>
-            <textarea data-import placeholder='Cole aqui o JSON de backup'></textarea>
-            <button class="btn" data-import-backup>IMPORTAR BACKUP</button>
-            <div class="admin-card danger-zone">
-              <h2>Resetar loja</h2>
-              <p class="muted">Volta para os produtos fake originais e limpa alterações locais.</p><br>
-              <button class="btn ghost" data-reset-store>RESETAR TUDO</button>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-  </section>
+  function renderOrders(){
+    const box=$('[data-orders-list]'); if(!box) return;
+    if(!orders.length){ box.innerHTML='<p class="muted">Nenhum pedido ainda.</p>'; return; }
+    box.innerHTML = orders.map(o => `<div class="order-row">
+      <header><div><strong>${o.id}</strong><p class="muted">${new Date(o.date).toLocaleString('pt-BR')} • ${escapeHtml(o.customer?.name||'')}</p></div><span class="pill">${escapeHtml(o.status||'novo')}</span></header>
+      <pre>${escapeHtml(orderText(o))}</pre>
+      <div class="row-actions"><button class="mini" data-order-status="${o.id}" data-status="pago">Marcar pago</button><button class="mini" data-order-status="${o.id}" data-status="enviado">Enviado</button><button class="mini danger" data-order-status="${o.id}" data-status="cancelado">Cancelar</button></div>
+    </div>`).join('');
+  }
+  function orderText(o){
+    const lines=[]; lines.push(`Cliente: ${o.customer?.name||''}`); lines.push(`Telefone: ${o.customer?.phone||''}`); lines.push(`E-mail: ${o.customer?.email||''}`); lines.push(`Endereço: ${o.customer?.address||''}`); if(o.customer?.cep) lines.push(`CEP: ${o.customer.cep}`); if(o.customer?.note) lines.push(`Obs: ${o.customer.note}`); lines.push(`Pagamento: ${(o.payment||'').toUpperCase()}`); lines.push('Itens:'); (o.items||[]).forEach(i=>lines.push(`- ${i.qty}x ${i.name} (${money(i.price)})`)); lines.push(`Total: ${money(o.total)}`); return lines.join('\n');
+  }
 
-  <div class="toast" data-toast></div>
-  <script src="js/data.js"></script>
-  <script src="js/admin.js"></script>
-</body>
-</html>
+  function renderTickets(){
+    const box=$('[data-tickets-list]'); if(!box) return;
+    if(!tickets.length){ box.innerHTML='<p class="muted">Nenhum atendimento ainda.</p>'; return; }
+    box.innerHTML = tickets.map(t => `<div class="ticket-row">
+      <header><div><strong>${escapeHtml(t.subject)}</strong><p class="muted">${new Date(t.date).toLocaleString('pt-BR')} • ${escapeHtml(t.name)} • ${escapeHtml(t.contact)}</p></div><span class="pill">${escapeHtml(t.status||'novo')}</span></header>
+      <pre>${escapeHtml(t.message)}</pre>
+      <div class="row-actions"><button class="mini" data-ticket-status="${t.id}" data-status="respondido">Respondido</button><button class="mini" data-ticket-status="${t.id}" data-status="fechado">Fechado</button></div>
+    </div>`).join('');
+  }
+
+  function fillSettings(){
+    const f=$('[data-settings-form]'); if(!f) return;
+    Object.keys(settings).forEach(k => { if(f.elements[k]) f.elements[k].value = settings[k] ?? ''; });
+  }
+  $('[data-settings-form]')?.addEventListener('submit', ev => {
+    ev.preventDefault(); const f=ev.currentTarget;
+    ['brand','tagline','instagram','whatsapp','pixKey','pixName','pixCity','cardPaymentLink','shippingText','supportText'].forEach(k => settings[k]=f.elements[k]?.value || '');
+    setJSON(SETTINGS_KEY, settings); toast('Configurações salvas'); renderAll();
+  });
+
+  $('[data-save-all]')?.addEventListener('click', save);
+  $('[data-clear-orders]')?.addEventListener('click', () => { if(confirm('Limpar pedidos?')){ orders=[]; setJSON(ORDERS_KEY,orders); renderAll(); } });
+  $('[data-clear-tickets]')?.addEventListener('click', () => { if(confirm('Limpar atendimentos?')){ tickets=[]; setJSON(TICKETS_KEY,tickets); renderAll(); } });
+  $('[data-generate-export]')?.addEventListener('click', () => { $('[data-export]').value = JSON.stringify({products,settings,orders,tickets}, null, 2); });
+  $('[data-copy-export]')?.addEventListener('click', () => { navigator.clipboard.writeText($('[data-export]').value); toast('Backup copiado'); });
+  $('[data-import-backup]')?.addEventListener('click', () => {
+    try{ const data=JSON.parse($('[data-import]').value); if(data.products) products=data.products; if(data.settings) settings={...settings,...data.settings}; if(data.orders) orders=data.orders; if(data.tickets) tickets=data.tickets; save(); }
+    catch{ toast('Backup inválido'); }
+  });
+  $('[data-reset-store]')?.addEventListener('click', () => { if(confirm('Resetar produtos, configurações, pedidos e atendimentos?')){ localStorage.removeItem(PRODUCT_KEY); localStorage.removeItem(SETTINGS_KEY); localStorage.removeItem(ORDERS_KEY); localStorage.removeItem(TICKETS_KEY); location.reload(); } });
+
+  function renderAll(){ renderStats(); renderProducts(); renderOrders(); renderTickets(); fillSettings(); }
+})();

@@ -3,200 +3,156 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ICANT — Can’t? Make it happen.</title>
-  <meta name="description" content="ICANT streetwear — loja online dark premium." />
+  <title>ICANT Admin</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body>
+<body class="admin-body">
   <div class="noise"></div>
 
-  <header class="site-header">
-    <a href="#top" class="brand">ICANT</a>
-    <nav class="desktop-nav" aria-label="Menu principal">
-      <a href="#shop">SHOP</a>
-      <a href="#recentes">ADICIONADOS RECENTEMENTE</a>
-      <a href="#archive">ARCHIVE</a>
-      <button data-support-open>AJUDA</button>
-    </nav>
-    <div class="header-actions">
-      <button class="icon-btn search-btn" data-search-open aria-label="Buscar">⌕</button>
-      <button class="cart-button" data-cart-open>CARRINHO (<span data-cart-count>0</span>)</button>
-      <button class="icon-btn mobile-toggle" data-menu-toggle aria-label="Menu">☰</button>
-    </div>
-  </header>
-
-  <aside class="mobile-menu" data-mobile-menu>
-    <div class="mobile-menu-top">
-      <strong>ICANT</strong>
-      <button class="icon-btn" data-menu-toggle aria-label="Fechar">×</button>
-    </div>
-    <a href="#shop" data-menu-link>SHOP</a>
-    <a href="#recentes" data-menu-link>ADICIONADOS RECENTEMENTE</a>
-    <a href="#archive" data-menu-link>ARCHIVE</a>
-    <div class="mobile-cats">
-      <a href="#camisetas" data-menu-link>CAMISETAS <span>›</span></a>
-      <a href="#calcas" data-menu-link>CALÇAS <span>›</span></a>
-      <a href="#calcados" data-menu-link>CALÇADOS <span>›</span></a>
-      <a href="#acessorios" data-menu-link>ACESSÓRIOS <span>›</span></a>
-    </div>
-    <button class="btn ghost full" data-support-open>ATENDIMENTO NO APP</button>
-    <div class="mobile-menu-footer">
-      <a data-instagram target="_blank" rel="noreferrer">INSTAGRAM</a>
-      <button data-support-open>CONTATO</button>
-      <a href="/admin/">ADMIN</a>
-    </div>
-  </aside>
-
-  <section class="search-panel" data-search-panel>
-    <input type="search" data-search-input placeholder="BUSCAR PRODUTO" />
-    <button class="btn black" data-search-close>FECHAR</button>
+  <section class="login-screen" data-login>
+    <form class="login-card" data-login-form>
+      <h1>ICANT ADMIN</h1>
+      <p>Entre no painel para adicionar, editar e excluir produtos, configurar PIX/WhatsApp e ver pedidos/atendimentos.</p>
+      <label class="field">Senha do painel<input type="password" name="password" autocomplete="current-password" required></label>
+      <br>
+      <button class="btn full" type="submit">ENTRAR</button>
+      <p class="muted" style="margin-top:14px">Senha configurada: 87759129Br**</p>
+    </form>
   </section>
 
-  <main id="top">
-    <section class="hero">
-      <img class="hero-flower" src="assets/flower-branch.png" alt="" />
-      <div class="hero-center">
-        <img class="hero-mark" src="assets/hero-mark.png" alt="ICANT" />
-        <p class="tagline" data-tagline>Can’t? Make it happen.</p>
-        <a class="down" href="#recentes" aria-label="Ver produtos">↓</a>
-      </div>
-      <div class="hero-links">
-        <a data-instagram target="_blank" rel="noreferrer">INSTAGRAM</a>
-        <button data-support-open>CONTATO</button>
-        <button data-support-open>AJUDA</button>
-        <a href="#termos">TERMOS</a>
-      </div>
-      <span class="hero-copy">© ICANT 2025</span>
-    </section>
-
-    <section id="shop" class="shop-wrap">
-      <section id="recentes" class="product-section">
-        <div class="section-title-row"><h2>ADICIONADOS RECENTEMENTE</h2><button class="text-link" data-filter="recentes">VER TUDO</button></div>
-        <div class="product-grid" data-grid="recentes"></div>
-      </section>
-      <section id="camisetas" class="product-section">
-        <div class="section-title-row"><h2>CAMISETAS</h2><button class="text-link" data-filter="camisetas">VER TUDO</button></div>
-        <div class="product-grid" data-grid="camisetas"></div>
-      </section>
-      <section id="calcas" class="product-section">
-        <div class="section-title-row"><h2>CALÇAS</h2><button class="text-link" data-filter="calcas">VER TUDO</button></div>
-        <div class="product-grid" data-grid="calcas"></div>
-      </section>
-      <section id="calcados" class="product-section">
-        <div class="section-title-row"><h2>CALÇADOS</h2><button class="text-link" data-filter="calcados">VER TUDO</button></div>
-        <div class="product-grid" data-grid="calcados"></div>
-      </section>
-      <section id="acessorios" class="product-section">
-        <div class="section-title-row"><h2>ACESSÓRIOS</h2><button class="text-link" data-filter="acessorios">VER TUDO</button></div>
-        <div class="product-grid" data-grid="acessorios"></div>
-      </section>
-    </section>
-
-    <section id="archive" class="archive-section">
+  <section class="admin-shell hidden" data-admin>
+    <aside class="admin-sidebar">
       <div>
-        <span class="eyebrow">ARCHIVE</span>
-        <h2>Monte seu outfit</h2>
-        <p>Escolha peças da loja e visualize um kit flat-lay limpo antes de comprar. Você pode adicionar o outfit inteiro no carrinho.</p>
+        <div class="admin-logo">ICANT</div>
+        <p class="admin-small">Painel prático para operar a loja.</p>
       </div>
-      <div class="outfit-builder">
-        <div class="outfit-controls">
-          <label>Parte de cima<select data-outfit="camisetas"></select></label>
-          <label>Calça / Short<select data-outfit="calcas"></select></label>
-          <label>Calçado<select data-outfit="calcados"></select></label>
-          <label>Acessório<select data-outfit="acessorios"></select></label>
-          <button class="btn full" data-outfit-add>ADICIONAR OUTFIT</button>
+      <nav class="admin-nav">
+        <button class="admin-tab active" data-tab="dashboard">Resumo</button>
+        <button class="admin-tab" data-tab="products">Produtos</button>
+        <button class="admin-tab" data-tab="orders">Pedidos</button>
+        <button class="admin-tab" data-tab="tickets">Atendimentos</button>
+        <button class="admin-tab" data-tab="settings">Configurações</button>
+        <button class="admin-tab" data-tab="backup">Backup</button>
+      </nav>
+      <div class="admin-sidebar-footer">
+        <a class="btn ghost full" href="index.html">VER SITE</a>
+        <button class="btn black full" data-logout>SAIR</button>
+      </div>
+    </aside>
+
+    <main class="admin-content">
+      <div class="admin-top">
+        <div><span class="eyebrow">PAINEL ADMIN</span><h1 data-admin-title>Resumo</h1></div>
+        <button class="btn" data-save-all>SALVAR ALTERAÇÕES</button>
+      </div>
+
+      <section class="admin-section active" data-section="dashboard">
+        <div class="stats">
+          <div class="stat"><span>Produtos</span><strong data-stat-products>0</strong></div>
+          <div class="stat"><span>Pedidos</span><strong data-stat-orders>0</strong></div>
+          <div class="stat"><span>Atendimentos</span><strong data-stat-tickets>0</strong></div>
+          <div class="stat"><span>Total vendido</span><strong data-stat-total>R$ 0,00</strong></div>
         </div>
-        <div class="outfit-canvas" data-outfit-canvas></div>
-      </div>
-    </section>
+        <div class="admin-note">
+          O site já está com produtos fake e visual igual ao mockup. Para vender agora, configure no menu <strong>Configurações</strong>: sua chave PIX e seu WhatsApp. O pedido gera PIX copia e cola e botão para enviar o pedido no WhatsApp.
+        </div>
+        <div class="admin-card">
+          <h2>Links rápidos</h2>
+          <p class="muted">Painel: <strong>/admin/</strong> ou <strong>/admin.html</strong>. Loja: <strong>/</strong>.</p>
+        </div>
+      </section>
 
-    <section class="trust-row">
-      <article><div class="ico">⌂</div><strong>PAGAMENTO SEGURO</strong><p>PIX na hora com copia e cola e QR Code.</p></article>
-      <article><div class="ico">▱</div><strong>ENVIO PARA TODO BRASIL</strong><p data-shipping-text>Envio combinado pelo atendimento após o pedido.</p></article>
-      <article><div class="ico">♺</div><strong>TROCA GARANTIDA</strong><p>7 dias para trocas ou devoluções após o recebimento.</p></article>
-      <article><div class="ico">♡</div><strong>ATENDIMENTO</strong><p data-support-text>Suporte no app e botão para WhatsApp.</p></article>
-    </section>
-  </main>
+      <section class="admin-section" data-section="products">
+        <div class="admin-grid">
+          <form class="admin-card admin-form" data-product-form>
+            <h2 data-product-form-title>Novo produto</h2>
+            <input type="hidden" name="id">
+            <label class="field">Nome do produto<input required name="name" placeholder="ICANT BLOOM TEE"></label>
+            <div class="form-grid two">
+              <label class="field">Preço<input required name="price" type="number" min="0" step="0.01" placeholder="109.90"></label>
+              <label class="field">Estoque<input required name="stock" type="number" min="0" step="1" value="1"></label>
+            </div>
+            <label class="field">Categoria<select required name="category"></select></label>
+            <label class="field">Descrição<textarea name="description" placeholder="Descrição curta do produto"></textarea></label>
+            <label class="field">Imagem por URL<input name="imageUrl" placeholder="https://..."></label>
+            <label class="field">Ou subir imagem do computador<input name="imageFile" type="file" accept="image/*"></label>
+            <div class="image-preview" data-image-preview>Preview da imagem</div>
+            <div class="check-row">
+              <label><input type="checkbox" name="recent"> Recente</label>
+              <label><input type="checkbox" name="active" checked> Ativo</label>
+            </div>
+            <div class="form-actions">
+              <button class="btn" type="submit">SALVAR PRODUTO</button>
+              <button class="btn ghost" type="button" data-product-reset>LIMPAR</button>
+            </div>
+          </form>
+          <div class="admin-card">
+            <div class="admin-list-head"><h2>Produtos cadastrados</h2><input data-product-search placeholder="Buscar produto"></div>
+            <div class="admin-list" data-products-list></div>
+          </div>
+        </div>
+      </section>
 
-  <footer id="termos" class="footer">
-    <p>© ICANT 2025. TODOS OS DIREITOS RESERVADOS.</p>
-    <a href="/admin/">PAINEL ADMIN</a>
-  </footer>
-  <a href="/admin/" class="admin-link-floating">admin</a>
+      <section class="admin-section" data-section="orders">
+        <div class="admin-card">
+          <div class="admin-list-head"><h2>Pedidos</h2><button class="btn ghost" data-clear-orders>LIMPAR PEDIDOS</button></div>
+          <div class="admin-list" data-orders-list></div>
+        </div>
+      </section>
 
-  <aside class="drawer" data-cart-drawer>
-    <div class="drawer-head"><strong>CARRINHO</strong><button class="icon-btn" data-cart-close>×</button></div>
-    <div class="cart-items" data-cart-items></div>
-    <div class="cart-summary">
-      <div><span>Subtotal</span><strong data-cart-subtotal>R$ 0,00</strong></div>
-      <button class="btn full" data-checkout-open>FINALIZAR COMPRA</button>
-      <button class="btn ghost full" data-cart-clear>LIMPAR CARRINHO</button>
-    </div>
-  </aside>
-  <div class="overlay" data-overlay></div>
+      <section class="admin-section" data-section="tickets">
+        <div class="admin-card">
+          <div class="admin-list-head"><h2>Atendimentos</h2><button class="btn ghost" data-clear-tickets>LIMPAR ATENDIMENTOS</button></div>
+          <div class="admin-list" data-tickets-list></div>
+        </div>
+      </section>
 
-  <dialog class="modal" data-product-modal>
-    <button class="modal-close" data-modal-close>×</button>
-    <div data-product-detail></div>
-  </dialog>
+      <section class="admin-section" data-section="settings">
+        <form class="admin-card admin-form" data-settings-form>
+          <h2>Configurações da loja</h2>
+          <div class="settings-grid">
+            <label class="field">Nome da marca<input name="brand"></label>
+            <label class="field">Frase do hero<input name="tagline"></label>
+            <label class="field">Instagram<input name="instagram" placeholder="https://instagram.com/sua_loja"></label>
+            <label class="field">WhatsApp da loja<input name="whatsapp" placeholder="5531999999999"></label>
+            <label class="field">Chave PIX<input name="pixKey" placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"></label>
+            <label class="field">Nome do recebedor PIX<input name="pixName" maxlength="25"></label>
+            <label class="field">Cidade PIX<input name="pixCity" maxlength="15"></label>
+            <label class="field">Link de pagamento/cartão<input name="cardPaymentLink" placeholder="Mercado Pago, Stripe, etc."></label>
+          </div>
+          <label class="field">Texto de envio<textarea name="shippingText"></textarea></label>
+          <label class="field">Texto de atendimento<textarea name="supportText"></textarea></label>
+          <button class="btn" type="submit">SALVAR CONFIGURAÇÕES</button>
+        </form>
+      </section>
 
-  <dialog class="modal" data-checkout-modal>
-    <button class="modal-close" data-checkout-close>×</button>
-    <form class="checkout-form" data-checkout-form>
-      <h2>Finalizar compra</h2>
-      <p class="muted">Preencha seus dados. O pedido será gerado com PIX e também pode ser enviado para o WhatsApp da loja.</p>
-      <div class="form-grid two">
-        <label class="field">Nome completo<input required name="name" autocomplete="name"></label>
-        <label class="field">Telefone / WhatsApp<input required name="phone" autocomplete="tel"></label>
-        <label class="field">E-mail<input required type="email" name="email" autocomplete="email"></label>
-        <label class="field">CEP<input name="cep" autocomplete="postal-code"></label>
-      </div>
-      <label class="field">Endereço completo<textarea required name="address"></textarea></label>
-      <label class="field">Observação / tamanho / referência<textarea name="note"></textarea></label>
-      <div class="checkout-total"><span>Total</span><strong data-checkout-total>R$ 0,00</strong></div>
-      <div class="radio-row">
-        <label class="radio-card"><input type="radio" name="payment" value="pix" checked> PIX NA HORA</label>
-        <label class="radio-card"><input type="radio" name="payment" value="card"> LINK / CARTÃO</label>
-      </div>
-      <button class="btn full" type="submit">GERAR PEDIDO</button>
-    </form>
-    <div class="result-box hidden" data-order-result>
-      <h2>Pedido gerado</h2>
-      <p class="muted" data-order-message></p>
-      <div class="pix-box hidden" data-pix-box>
-        <img data-pix-qr alt="QR Code PIX">
-        <textarea readonly data-pix-code></textarea>
-        <button class="btn" data-copy-pix>COPIAR PIX</button>
-      </div>
-      <a class="btn full hidden" data-card-link target="_blank" rel="noreferrer">PAGAR NO LINK</a>
-      <a class="btn ghost full hidden" data-order-whatsapp target="_blank" rel="noreferrer">ENVIAR PEDIDO NO WHATSAPP</a>
-      <button class="btn black full" data-finish-order>FECHAR</button>
-    </div>
-  </dialog>
-
-  <dialog class="modal" data-support-modal>
-    <button class="modal-close" data-support-close>×</button>
-    <div class="support-chat">
-      <div class="support-info">
-        <span class="eyebrow">ATENDIMENTO</span>
-        <h2>Fale com a ICANT</h2>
-        <p class="muted">Abra um atendimento no site ou chame direto no WhatsApp.</p>
-        <br>
-        <a class="btn ghost hidden" data-support-whatsapp target="_blank" rel="noreferrer">CHAMAR NO WHATSAPP</a>
-      </div>
-      <form class="support-form" data-support-form>
-        <label class="field">Nome<input required name="name"></label>
-        <label class="field">Contato<input required name="contact" placeholder="WhatsApp ou e-mail"></label>
-        <label class="field">Assunto<input required name="subject"></label>
-        <label class="field">Mensagem<textarea required name="message"></textarea></label>
-        <button class="btn full" type="submit">ENVIAR ATENDIMENTO</button>
-      </form>
-    </div>
-  </dialog>
+      <section class="admin-section" data-section="backup">
+        <div class="admin-grid">
+          <div class="admin-card export-box">
+            <h2>Exportar dados</h2>
+            <p class="muted">Use para guardar uma cópia ou migrar para outro navegador.</p>
+            <textarea data-export readonly></textarea>
+            <button class="btn" data-generate-export>GERAR BACKUP</button>
+            <button class="btn ghost" data-copy-export>COPIAR BACKUP</button>
+          </div>
+          <div class="admin-card export-box">
+            <h2>Importar dados</h2>
+            <p class="muted">Cole um backup antigo e clique em importar.</p>
+            <textarea data-import placeholder='Cole aqui o JSON de backup'></textarea>
+            <button class="btn" data-import-backup>IMPORTAR BACKUP</button>
+            <div class="admin-card danger-zone">
+              <h2>Resetar loja</h2>
+              <p class="muted">Volta para os produtos fake originais e limpa alterações locais.</p><br>
+              <button class="btn ghost" data-reset-store>RESETAR TUDO</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </section>
 
   <div class="toast" data-toast></div>
-
   <script src="js/data.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
 </body>
 </html>
