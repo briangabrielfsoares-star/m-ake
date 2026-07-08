@@ -11,7 +11,7 @@ Arquivos principais:
 
 ## Login do painel
 
-Senha: `87759129Br**`
+Senha: `secret`
 
 Acesse:
 
